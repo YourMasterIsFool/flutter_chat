@@ -134,6 +134,15 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
       return Colors.white;
     }
 
+
+    _unReadedBackground(states){
+      if(states.contains(MaterialState.pressed)) {
+        return Colors.blue.shade300;
+      }
+
+      return Colors.blue.shade100;
+    } 
+
     return StreamBuilder<dynamic>(
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -148,7 +157,7 @@ class _GroupChatScreenState extends State<GroupChatScreen> {
               style: ButtonStyle(
                   elevation: MaterialStateProperty.all(0),
                   backgroundColor:
-                      MaterialStateProperty.resolveWith(_backgroundColor),
+                      MaterialStateProperty.resolveWith(group['last_message_userID'] == user_id ? _backgroundColor : _unReadedBackground),
                   padding: MaterialStateProperty.all(
                       EdgeInsets.symmetric(horizontal: 16, vertical: 12.0))),
               child: Row(

@@ -150,14 +150,14 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                     return TextButton(
                         onPressed: () {
                           GroupModel _groupModel = new GroupModel(
-                              hobby: _hobbyController.text.trim(),
+                              hobby: _hobbyController.text.trim().toLowerCase(),
                               members: [],
                               last_message: "",
                               last_message_userId: "",
                               last_message_date: DateTime.now(),
                               group_description:
                                   "Group  ${_hobbyController.text.trim()} di ${_lokasiController.text.trim()}",
-                              lokasi: _lokasiController.text.trim(),
+                              lokasi: _lokasiController.text.trim().toLowerCase(),
                               createdAt: DateTime.now(),
                               owner_uid: user_id);
 

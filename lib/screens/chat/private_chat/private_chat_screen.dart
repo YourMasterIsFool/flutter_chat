@@ -105,6 +105,14 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
       return Colors.white;
     }
 
+    _unReadedBackground(states){
+      if(states.contains(MaterialState.pressed)) {
+        return Colors.blue.shade300;
+      }
+
+      return Colors.blue.shade100;
+    } 
+
     return StreamBuilder<dynamic>(
       builder: (context, snapshot) {
         if (snapshot.hasData) {
@@ -121,7 +129,9 @@ class _PrivateChatScreenState extends State<PrivateChatScreen> {
               style: ButtonStyle(
                   elevation: MaterialStateProperty.all(0),
                   backgroundColor:
-                      MaterialStateProperty.resolveWith(_backgroundColor),
+                      MaterialStateProperty.resolveWith(
+                        data['last_message_userID'] == user_id ? _backgroundColor : _unReadedBackground
+                      ),
                   padding: MaterialStateProperty.all(
                       EdgeInsets.symmetric(horizontal: 16, vertical: 12.0))),
               child: Row(

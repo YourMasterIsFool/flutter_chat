@@ -6,6 +6,7 @@ import 'package:flutter_chat/preferences/user_pref.dart';
 import 'package:flutter_chat/screens/person_profile/person_textfield.dart';
 import '../../styles.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:collection/collection.dart';
 
 class PersonProfileScreen extends StatefulWidget {
   final String partner_uid;
@@ -79,13 +80,94 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
                           height: 24,
                         ),
                         // info bio
-                        _bioContainer(context, data['bio'])
+                        _bioContainer(context, data['bio']),
+
+                        SizedBox(
+                          height: 24,
+                        ),
+                        
+                        widget.partner_uid != user_id ?
+                        _contactContainer(context, widget.partner_uid): Container()
+
                       ]))));
         }
         return Container();
       },
       stream: firestore.collection('users').doc(widget.partner_uid).snapshots(),
     ));
+  }
+
+  Widget _contactContainer(BuildContext context, String? partner_uid) {
+
+    _removeContact(){
+      firestore.collection('users').doc(user_id).update({
+        'friends': FieldValue.arrayRemove([partner_uid])
+      });
+    }
+
+    _addContact(){
+      print("added");
+       firestore.collection('users').doc(user_id).update({
+        'friends': FieldValue.arrayUnion([partner_uid])
+      });
+    }
+
+    _removeColor(states){
+      if(states.contains(MaterialState.pressed)){
+        return Colors.red.shade700;
+      }
+
+      return Colors.red.shade500;
+    }
+
+    _addColor(states){
+      if(states.contains(MaterialState.pressed)){
+        return Colors.blue.shade700;
+      }
+
+      return Colors.blue.shade500;
+    }
+    return 
+
+    StreamBuilder<dynamic>(
+      builder: (context, snapshot) {
+        if(snapshot.hasData){
+          List friends = snapshot.data.data()['friends'];
+          var _addedFriend = friends.firstWhereOrNull((item) => item == partner_uid);
+
+          return ElevatedButton(
+            onPressed: () {
+                _addedFriend != null ? _removeContact() : _addContact();
+              },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith(_addedFriend != null ? _removeColor : _addColor),
+            ),
+            child: Container(
+              width: double.infinity,
+              padding: EdgeInsets.all(20.0),
+              child: Center(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center, 
+                  children: [
+                    Icon(_addedFriend != null ? Icons.person_remove : Icons.person_add),
+                    SizedBox(
+                      width: 4.0,
+                    ),
+                    Text(
+                      "${_addedFriend != null ? 'Remove Contact' :'Add Contact'}")
+                  ]
+                )
+              )
+              )
+            );
+        }
+
+        return Container();
+      },
+      stream: firestore.collection('users').doc(user_id).snapshots()
+    );
+    
   }
 
   // for bio container
@@ -134,7 +216,7 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
+            Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Name',
@@ -204,44 +286,113 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
                     .then((value) {
                       print(value.docs.length);
                       if (value.docs.length > 0) {
-                        var chats = value.docs;
+                        List chats = value.docs;
+                        print(chats);
+                        var _chatFound = chats.firstWhereOrNull((element) {
+                          List members = element.data()['members'];
+                          print(members.toString());
+                          if (members.isEmpty) {
+                            return false;
+                          }
 
-                        for (var chat in chats) {
-                          var chat_detail = chat.data();
-                          List members = chat_detail['members'];
-                          if (members.contains(widget.partner_uid)) {
-                            Navigator.pushReplacementNamed(
-                                context, '/private_message', arguments: {
-                              'chat_uid': chat.id,
-                              'partner_uid': widget.partner_uid
-                            });
-                          } else {
-                            firestore
-                                .collection('chats')
-                                .add(_chatModel.toJson())
-                                .then((chat) {
+                          return members.contains(widget.partner_uid);
+                        });
+
+                        if (_chatFound != null) {
+                          Navigator.pushReplacementNamed(
+                              context, '/private_message', arguments: {
+                            'chat_uid': _chatFound.id,
+                            'partner_uid': widget.partner_uid
+                          });
+                        } else {
+                          firestore
+                              .collection('chats')
+                              .add(_chatModel.toJson())
+                              .then((chat) {
+                            firestore.collection('users').doc(user_id).update({
+                              'chats': FieldValue.arrayUnion([chat.id])
+                            }).then((value) {
                               firestore
                                   .collection('users')
-                                  .doc(user_id)
+                                  .doc(widget.partner_uid)
                                   .update({
                                 'chats': FieldValue.arrayUnion([chat.id])
                               }).then((value) {
-                                firestore
-                                    .collection('users')
-                                    .doc(widget.partner_uid)
-                                    .update({
-                                  'chats': FieldValue.arrayUnion([chat.id])
-                                }).then((value) {
-                                  Navigator.pushNamed(
-                                      context, '/private_message', arguments: {
-                                    'chat_uid': chat.id,
-                                    'partner_uid': widget.partner_uid
-                                  });
-                                });
+                                Navigator.pushNamed(context, '/private_message',
+                                    arguments: {
+                                      'chat_uid': chat.id,
+                                      'partner_uid': widget.partner_uid
+                                    });
                               });
                             });
-                          }
+                          });
                         }
+
+                        // Navigator.pushReplacementNamed(
+                        //     context, '/private_message', arguments: {
+                        //   'chat_uid': _chartFound.id,
+                        //   'partner_uid': widget.partner_uid
+                        // });
+
+                        // for (var chat in chats) {
+                        //   var chat_detail = chat.data();
+                        //   List members = chat_detail['members'];
+                        //   if (members.contains(widget.partner_uid)) {
+                        //     Navigator.pushReplacementNamed(
+                        //         context, '/private_message', arguments: {
+                        //       'chat_uid': chat.id,
+                        //       'partner_uid': widget.partner_uid
+                        //     });
+                        //   } else {
+                        //     firestore
+                        //         .collection('chats')
+                        //         .add(_chatModel.toJson())
+                        //         .then((chat) {
+                        //       firestore
+                        //           .collection('users')
+                        //           .doc(user_id)
+                        //           .update({
+                        //         'chats': FieldValue.arrayUnion([chat.id])
+                        //       }).then((value) {
+                        //         firestore
+                        //             .collection('users')
+                        //             .doc(widget.partner_uid)
+                        //             .update({
+                        //           'chats': FieldValue.arrayUnion([chat.id])
+                        //         }).then((value) {
+                        //           Navigator.pushNamed(
+                        //               context, '/private_message', arguments: {
+                        //             'chat_uid': chat.id,
+                        //             'partner_uid': widget.partner_uid
+                        //           });
+                        //         });
+                        //       });
+                        //     });
+                        //     break;
+                        //   }
+                        // }
+
+                        // firestore
+                        //     .collection('chats')
+                        //     .add(_chatModel.toJson())
+                        //     .then((chat) {
+                        //   firestore.collection('users').doc(user_id).update({
+                        //     'chats': FieldValue.arrayUnion([chat.id])
+                        //   }).then((value) {
+                        //     firestore
+                        //         .collection('users')
+                        //         .doc(widget.partner_uid)
+                        //         .update({
+                        //       'chats': FieldValue.arrayUnion([chat.id])
+                        //     }).then((value) {
+                        //       Navigator.pushNamed(context, '/private_message',
+                        //           arguments: {
+                        //             'chat_uid': chat.id,
+                        //             'partner_uid': widget.partner_uid
+                        //           });
+                        //     });
+                        //   });
+                        // });
                       } else {
                         firestore
                             .collection('chats')

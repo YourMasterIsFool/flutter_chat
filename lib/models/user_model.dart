@@ -5,8 +5,10 @@ class UserModel {
   String? bio;
   List? groups = [];
   List? chats = [];
+  List? friends = [];
   UserModel(
       {required this.email,
+        this.friends,
       this.bio,
       required this.password,
       required this.fullname});
@@ -14,6 +16,7 @@ class UserModel {
   toJson() {
     return {
       'email': this.email,
+      'friends': this.friends ?? [],
       'bio': this.bio ?? "",
       'fullname': this.fullname,
       'password': this.password,

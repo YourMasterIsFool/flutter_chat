@@ -87,7 +87,10 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
                         ),
                         
                         widget.partner_uid != user_id ?
-                        _contactContainer(context, widget.partner_uid): Container()
+                        _contactContainer(context, widget.partner_uid): Container(),
+
+                        widget.partner_uid == user_id?
+                        _logoutContainer(context, widget.partner_uid): Container()
 
                       ]))));
         }
@@ -168,6 +171,41 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
       stream: firestore.collection('users').doc(user_id).snapshots()
     );
     
+  }
+
+
+  Widget _logoutContainer(BuildContext context, String bio) {
+    _backgroundColor(states) {
+      if(states.contains(MaterialState.pressed)) {
+        return Colors.grey.shade100;
+      }
+      return Colors.white;
+    }
+    return ElevatedButton(
+      onPressed:(){
+        Navigator.of(context)
+        .pushNamedAndRemoveUntil('/login', (Route<dynamic> route) => false);
+      },
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith(_backgroundColor),
+        foregroundColor: MaterialStateProperty.all(Colors.red.shade400),
+      ),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical:kDefaultPadding),
+        child: Center(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(Icons.logout),
+              SizedBox(
+                width: 8.0,
+              ),
+              Text("Logout")
+            ]
+          )
+        )
+      )
+      );
   }
 
   // for bio container

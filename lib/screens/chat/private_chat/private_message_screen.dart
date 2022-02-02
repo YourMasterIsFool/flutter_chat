@@ -72,7 +72,8 @@ class _PrivateMessageScreenState extends State<PrivateMessageScreen> {
                             .doc(widget.chat_uid)
                             .delete()
                             .then((resp) {
-                          Navigator.pushReplacementNamed(context, '/');
+                           Navigator.of(context)
+                          .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
                         });
                       });
                     } else {}

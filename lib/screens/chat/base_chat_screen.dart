@@ -50,12 +50,7 @@ class _BaseChatScreen extends State<BaseChatScreen>
         initialIndex: 0,
         child: Scaffold(
             appBar: AppBar(
-                leading: IconButton(
-                  icon: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pushReplacementNamed(context, '/login');
-                  },
-                ),
+               automaticallyImplyLeading: false,
                 actions: [
                   IconButton(
                       color: Colors.white,

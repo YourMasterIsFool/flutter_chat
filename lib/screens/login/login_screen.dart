@@ -34,7 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
       if (snapshot.docs.length > 0) {
         var user = snapshot.docs[0];
         await set_userId(user.id).then((value) {
-          Navigator.pushNamed(context, '/');
+          Navigator.of(context)
+        .pushNamedAndRemoveUntil('/', (Route<dynamic> route) => false);
         });
       } else {
         setState(() {

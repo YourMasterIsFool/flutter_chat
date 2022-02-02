@@ -70,12 +70,13 @@ class _NewChatScreenState extends State<NewChatScreen> {
                 if(snapshot.hasData){
                   var data = snapshot.data.data();
                   List friends = data['friends'];
+        
                   return _contactListComponent(context, friends);
                 }
 
                 return Container();
               },
-              stream: firestore.collection('users').doc(user_id).snapshots()
+              stream: firestore.collection('users').doc("${user_id}").snapshots()
             ))
           ],
         ),
@@ -113,7 +114,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
     );
   }
 
-  Widget _contactComponent(String? friend_id) {
+  Widget _contactComponent(String friend_id) {
     _backgroundColor(states) {
       if (states.contains(MaterialState.pressed)) {
         return Colors.grey.shade300;
@@ -127,6 +128,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
       builder: (context, snapshot){
         if(snapshot.hasData){
           var data = snapshot.data.data();
+          print(friend_id);
           print(data);
           return ElevatedButton(
             onPressed: () {
@@ -164,7 +166,7 @@ class _NewChatScreenState extends State<NewChatScreen> {
 
         return Container();
       },
-      stream: firestore.collection('users').doc(friend_id).snapshots()
+      stream: firestore.collection('users').doc("${friend_id}").snapshots()
     );
     
   }

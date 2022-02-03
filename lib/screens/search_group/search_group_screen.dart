@@ -45,41 +45,6 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
         title: Text("Search Group",
             style: textTitle.copyWith(
                 color: Colors.white, fontWeight: FontWeight.bold)),
-        // title: Row(
-        //   crossAxisAlignment: CrossAxisAlignment.center,
-        //   children: [
-        //     Flexible(
-        //         flex: 1,
-        //         child: TextField(
-        //           controller: _searchController,
-        //           style: textSubtitle.copyWith(color: Colors.white),
-        //           decoration: InputDecoration(
-        //               border: InputBorder.none,
-        //               hintText: "Search Group",
-        //               hintStyle:
-        //                   textSubtitle.copyWith(color: Colors.grey.shade300),
-        //               contentPadding:
-        //                   EdgeInsets.symmetric(horizontal: 8, vertical: 12)),
-        //         )),
-        //     SizedBox(
-        //       width: 24,
-        //     ),
-        //     IconButton(
-        //         onPressed: () {
-        //           setState(() {
-        //             var query = firestore.collection('groups').where(
-        //                 "category_group",
-        //                 isEqualTo: _searchController.text);
-        //             getGroups = query.snapshots();
-        //           });
-        //         },
-        //         icon: Icon(
-        //           Icons.search,
-        //           size: 24,
-        //           color: Colors.white,
-        //         ))
-        //   ],
-        // ),
       ),
       body: Padding(
         padding: EdgeInsets.all(12.0),
@@ -124,10 +89,12 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                 // snapshot.where('lokasi', isEqualTo: _lokasiController.text);
                 setState(() {
                   print(_hobbyController.text);
+
+                  //  SERVICE UNTUK MENCARI GROUP DI DI FIREBASE
                   getGroups = firestore
                       .collection('groups')
-                      .where('hobby', isEqualTo: _hobbyController.text.trim())
-                      .where('lokasi', isEqualTo: _lokasiController.text.trim())
+                      .where('hobby', isEqualTo: _hobbyController.text.trim().toLowerCase())
+                      .where('lokasi', isEqualTo: _lokasiController.text.trim().toLowerCase())
                       .snapshots();
                 });
               },
@@ -149,6 +116,10 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                   if (groups.length == 0) {
                     return TextButton(
                         onPressed: () {
+
+
+
+                          // CREATE GROUP KETIKA GROUP YG DI SEARCH TIDAK ADA
                           GroupModel _groupModel = new GroupModel(
                               hobby: _hobbyController.text.trim().toLowerCase(),
                               members: [],
@@ -184,6 +155,8 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                           ],
                         ));
                   } else {
+
+                    // MENAMPILKAN GROUP YG TELAH DI SEARCH TADI
                     var group = groups[0].data();
                     var group_uid = groups[0];
                     print(group);

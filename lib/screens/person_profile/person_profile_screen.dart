@@ -46,7 +46,7 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
                   (BuildContext context, bool innerSelectedBox) {
                 return [
                   SliverAppBar(
-                    expandedHeight: 350.0,
+                    expandedHeight: 400.0,
                     floating: false,
                     pinned: true,
                     flexibleSpace: FlexibleSpaceBar(
@@ -66,12 +66,9 @@ class _PersonProfileScreenState extends State<PersonProfileScreen> {
                   height: double.infinity,
                   decoration: BoxDecoration(color: Colors.grey.shade200),
                   child: Padding(
-                      padding: EdgeInsets.only(top: kDefaultPadding),
-                      child: Column(children: [
+                      padding: EdgeInsets.only(top: 0),
+                      child: ListView(children: [
                         _nameContainer(context, '${data["fullname"]}'),
-                        SizedBox(
-                          height: 24,
-                        ),
                         widget.partner_uid != user_id
                             ? _messageContainer(context)
                             : Container(),

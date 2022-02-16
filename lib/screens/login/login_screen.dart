@@ -6,7 +6,8 @@ import '../../models/user_model.dart';
 import '../../services/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/cupertino.dart';
+import '../forgot_password/CheckMailScreen.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
   @override
@@ -141,9 +142,22 @@ class _LoginScreenState extends State<LoginScreen> {
                               MaterialStateProperty.all(EdgeInsets.all(16))),
                     ),
                   ),
+
                   SizedBox(
-                    height: kDefaultPadding / 3,
+                    height: kDefaultPadding /4
                   ),
+                  Row(
+                    children: [
+                      Text("Forgot password?" , style:textSubtitle.copyWith(color: Colors.grey.shade600)),
+                      TextButton(
+                        onPressed: (){
+                          Navigator.push(context, CupertinoPageRoute(builder: (context) => CheckMailScreen()));
+                        },
+                        child: Text("recovery password")
+                      )
+                    ]
+                  ),
+            
                   Row(
                     children: [
                       Text(

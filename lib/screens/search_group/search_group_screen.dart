@@ -211,6 +211,8 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                           return Colors.grey.shade100;
                         })),
                         onPressed: () {
+
+                          """ sebuah fungsi untuk pindah halaman ke group yg dicari tadi """
                           Navigator.pushNamed(context, '/group_message',
                               arguments: {'group_uid': group_uid.id});
                         },

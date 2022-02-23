@@ -8,7 +8,6 @@ import '../../my_firebase.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
   @override
@@ -62,20 +61,62 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
 
       else {
-        FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+        FirebaseAuth _authInstance = FirebaseAuth.instance;
+        await _authInstance.createUserWithEmailAndPassword(email: _emailController.text.trim(), password:"verrandy123")
+        .then((UserCredential userCredential){
 
-        final credential = await _firebaseAuth.createUserWithEmailAndPassword(email: _emailController.text.trim(), password: _passwodController.text.trim());
+          User? user= userCredential.user;
+          print(user?.emailVerified.toString());
+          user?.sendEmailVerification().then((result) {
+
+              print("verification user email has been sended");
+                 UserModel user_model = new UserModel(
+                  email: _emailController.text,
+                  friends: [],
+                  question: "${question_val}".toLowerCase(),
+                  answer:_answerController.text.toLowerCase(),
+                  password: _passwodController.text,
+                  fullname: _fullnameController.text);
+
+                  UserService user_service = new UserService();
+
+                  user_service.create_user(user_model.toJson()).then((resp) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                    Navigator.pushNamed(context, "/login");
+                  });
+            
+          });
 
 
-        try {
-           // credential.user.sendEmailVerification();
+          // if(!user?.emailVerified) {
+          //   print(user?.emailVerified);
+          //    user?.sendEmailVerification()
+          //    .then((resp){
+          //       print("verification user email has been sended");
+          //        UserModel user_model = new UserModel(
+          //         email: _emailController.text,
+          //         friends: [],
+          //         question: "${question_val}".toLowerCase(),
+          //         answer:_answerController.text.toLowerCase(),
+          //         password: _passwodController.text,
+          //         fullname: _fullnameController.text);
 
+          //         UserService user_service = new UserService();
+
+          //         user_service.create_user(user_model.toJson()).then((resp) {
+          //           setState(() {
+          //             isLoading = false;
+          //           });
+          //           Navigator.pushNamed(context, "/login");
+          //         });
+          //     });
+          // }
         
-        }
-        catch(e) {
-          print(e);
-        }
-        
+        });
+
+      
         }
         
         setState(() {
@@ -189,6 +230,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               margin: EdgeInsets.only(bottom: kDefaultPadding),
                               child: TextField(
                                   controller: _fullnameController,
+
                                   decoration: InputDecoration(
                                       hintText: "Fullname",
                                       prefixIcon: Icon(Icons.person),

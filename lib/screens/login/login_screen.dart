@@ -8,6 +8,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/cupertino.dart';
 import '../forgot_password/CheckMailScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
   @override
@@ -31,7 +33,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
     UserService user_service = new UserService();
     var schema = {'email': email, 'password': password};
-    await user_service.login_user(schema).then<dynamic>((snapshot) async {
+
+    FirebaseAuth _authInstance = FirebaseAuth.instance;
+
+    UserCredential userCredential =  await _authInstance.signInWithEmailAndPassword(email: email, password: 'verrandy123');
+
+    User? user= userCredential.user;
+    bool emailVerified = user?.emailVerified ?? false;
+
+    print(emailVerified);
+    if(emailVerified == false)  {
+      setState(() {
+        error = "email belum terverifikasi"; 
+      });
+    }
+    else {
+      await user_service.login_user(schema).then<dynamic>((snapshot) async {
       if (snapshot.docs.length > 0) {
         var user = snapshot.docs[0];
         await set_userId(user.id).then((value) {
@@ -45,6 +62,9 @@ class _LoginScreenState extends State<LoginScreen> {
         });
       }
     });
+    }
+
+    
   }
 
   @override
@@ -106,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       error != ""
                           ? Text(
-                              "user tidak ada atau password salah",
+                              "${error}",
                               style: textSubtitle.copyWith(
                                   color: Colors.red.shade600),
                             )

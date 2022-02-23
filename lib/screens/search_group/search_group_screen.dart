@@ -113,9 +113,17 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                   //  SERVICE UNTUK MENCARI GROUP DI DI FIREBASE
                   """Mencari group difirebase menggunakan form input hobby dan lokasi"""
                   getGroups = firestore
+
+                      """ collections adalah fungsi untuk memanggil table group """
                       .collection('groups')
+
+                      """ where adalah sebuah fungsi mencari data pada column hobby di table groups sesuai dengan form input hobby """
                       .where('hobby', isEqualTo: _hobbyController.text.trim().toLowerCase())
+
+                      """ where adalah sebuah fungsi mencari data pada column hobby di table groups sesuai dengan form input lokasi """
                       .where('lokasi', isEqualTo: _lokasiController.text.trim().toLowerCase())
+
+                      """ snapshots adalah sebuah untuk menampilkan sebauh data """
                       .snapshots();
                 });
               },
@@ -164,9 +172,19 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                               createdAt: DateTime.now(),
                               owner_uid: user_id);
 
+                          """ menyimpan data group ke table group """
+                          
+                          """ firestore adalaha fungsi untuk mengambil data dari firebase"""
+
                           firestore
+
+                            """ collections adalah fungsi untuk memanggil table group """
                               .collection('groups')
+
+                            """ add adalah fungsin untuk menambahkan data group ke table group""" 
                               .add(_groupModel.toJson())
+
+                              """ then adalah fungsi apabila menambahkan data berhasil """
                               .then((value) {
                             print(value.id);
                           });

@@ -6,6 +6,8 @@ import '../../components/LoadingScreen.dart';
 import './ChooseQuestion.dart';
 import '../../my_firebase.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({Key? key}) : super(key: key);
@@ -53,29 +55,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
     await firestore..collection("users")
       .where("email",  isEqualTo:_emailController.text)
       .get()
-      .then((snapshot) {
+      .then((snapshot) async {
         if(snapshot.docs.length > 0) {
          error = "Email sudah digunakan";
         }
 
 
       else {
-        UserModel user_model = new UserModel(
-          email: _emailController.text,
-          friends: [],
-          question: "${question_val}".toLowerCase(),
-          answer:_answerController.text.toLowerCase(),
-          password: _passwodController.text,
-          fullname: _fullnameController.text);
+        FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-          UserService user_service = new UserService();
+        final credential = await _firebaseAuth.createUserWithEmailAndPassword(email: _emailController.text.trim(), password: _passwodController.text.trim());
 
-          user_service.create_user(user_model.toJson()).then((resp) {
-            setState(() {
-              isLoading = false;
-            });
-            Navigator.pushNamed(context, "/login");
-          });
+
+        try {
+           // credential.user.sendEmailVerification();
+
+        
+        }
+        catch(e) {
+          print(e);
+        }
+        
         }
         
         setState(() {

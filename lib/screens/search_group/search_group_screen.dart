@@ -17,18 +17,18 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
   final TextEditingController _searchController = new TextEditingController();
 
 
-  """ menyimpan data dari hobby form input"""
+  /*menyimpan data dari hobby form input */
   final TextEditingController _hobbyController = new TextEditingController();
 
-  """ menyimpan data dari lokasi form input """
+  /* menyimpan data dari lokasi form input */
   final TextEditingController _lokasiController = new TextEditingController();
 
-  """ variable menyimpan data user id"""
+  /* variable menyimpan data user id */
   var user_id;
 
 
-  """
-  1 mengambil data user_id dari shared preferences setelah login """
+  /*
+  1 mengambil data user_id dari shared preferences setelah login */
   Future<dynamic> get_user_id() async {
     await get_userId().then((data) {
       print(data);
@@ -39,7 +39,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
   }
 
 
-  """ variable untuk menyimpan data group """
+  /* variable untuk menyimpan data group */
   var getGroups;
 
   @override
@@ -50,7 +50,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
     get_user_id();
     super.initState();
   }
-  """ menginisialisasi sebelum load page """
+  /* menginisialisasi sebelum load page */
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                 height: 8.0,
               ),
               
-              """ form input untuk hobby  """
+              /* form input untuk hobby  */
               TextField(
                 controller: _hobbyController,
                 decoration: InputDecoration(
@@ -89,7 +89,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                 height: 8.0,
               ),
 
-              """ form input untuk lokasi """
+              /* form input untuk lokasi */
               TextField(
                 controller: _lokasiController,
                 decoration: InputDecoration(
@@ -103,7 +103,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
               height: 12.0,
             ),
 
-            """ button untuk mencari group"""
+            /* button untuk mencari group */
             ElevatedButton(
               onPressed: () {
                 // snapshot.where('lokasi', isEqualTo: _lokasiController.text);
@@ -111,19 +111,23 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                   // print(_hobbyController.text);
 
                   //  SERVICE UNTUK MENCARI GROUP DI DI FIREBASE
-                  """Mencari group difirebase menggunakan form input hobby dan lokasi"""
+                   /* Mencari group difirebase menggunakan form input hobby dan lokasi */
                   getGroups = firestore
 
-                      """ collections adalah fungsi untuk memanggil table group """
+                      /* collections adalah fungsi untuk memanggil table group */
                       .collection('groups')
 
-                      """ where adalah sebuah fungsi mencari data pada column hobby di table groups sesuai dengan form input hobby """
+                      /* where adalah sebuah fungsi mencari data pada column hobby di table groups sesuai dengan form input hobby 
+
+                          isEqualTo adalah fungsi sama dengan
+
+                      */
                       .where('hobby', isEqualTo: _hobbyController.text.trim().toLowerCase())
 
-                      """ where adalah sebuah fungsi mencari data pada column hobby di table groups sesuai dengan form input lokasi """
+                      /* where adalah sebuah fungsi mencari data pada column hobby di table groups sesuai dengan form input lokasi */
                       .where('lokasi', isEqualTo: _lokasiController.text.trim().toLowerCase())
 
-                      """ snapshots adalah sebuah untuk menampilkan sebauh data """
+                      /* snapshots adalah sebuah untuk menampilkan sebauh data  */
                       .snapshots();
                 });
               },
@@ -138,19 +142,19 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
             SizedBox(
               height: 12.0,
             ),
-            """ stream builder digunakan untuk mengambil data dari service lalu langsung di rendeer kedalam widget/component """
+            /* stream builder digunakan untuk mengambil data dari service lalu langsung di rendeer kedalam widget/component */
             StreamBuilder<dynamic>(
               builder: (context, snapshot) {
 
-                """ jika data ada """
+                /* jika data ada */
                 if (snapshot.hasData) {
                   var groups = snapshot.data.docs;
 
-                  """ 
+                  /*
                   jika jumlah group sama dengan 0 berarti group tersebut tidak ada 
                   maka akan muncul button create group
                   sesuai dengan group yg kita cari melalui form input hobby dan lokasi
-                  """
+                  */
                   if (groups.length == 0) {
                     return TextButton(
                         onPressed: () {
@@ -159,7 +163,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
 
                           // CREATE GROUP KETIKA GROUP YG DI SEARCH TIDAK ADA
 
-                          """ group model adalah schema data yang ingin dibuat didalam table group """
+                          /* group model adalah schema data yang ingin dibuat didalam table group */
                           GroupModel _groupModel = new GroupModel(
                               hobby: _hobbyController.text.trim().toLowerCase(),
                               members: [],
@@ -172,19 +176,18 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                               createdAt: DateTime.now(),
                               owner_uid: user_id);
 
-                          """ menyimpan data group ke table group """
-                          
-                          """ firestore adalaha fungsi untuk mengambil data dari firebase"""
+                          /* menyimpan data group ke table group */                          
+                          /* firestore adalaha fungsi untuk mengambil data dari firebase */
 
                           firestore
 
-                            """ collections adalah fungsi untuk memanggil table group """
+                            /* collections adalah fungsi untuk memanggil table group */
                               .collection('groups')
 
-                            """ add adalah fungsin untuk menambahkan data group ke table group""" 
+                            /* add adalah fungsin untuk menambahkan data group ke table group */ 
                               .add(_groupModel.toJson())
 
-                              """ then adalah fungsi apabila menambahkan data berhasil """
+                              /* then adalah fungsi apabila menambahkan data berhasil */
                               .then((value) {
                             print(value.id);
                           });
@@ -208,18 +211,18 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
 
                     // MENAMPILKAN GROUP YG TELAH DI SEARCH TADI
 
-                    """ apabila jumlah group lebih dari 0 atau tidak sama dengan 0 maka group tersebut ada 
+                    /* apabila jumlah group lebih dari 0 atau tidak sama dengan 0 maka group tersebut ada 
                         maka button yg menuju group itu akan muncul
-                    """
+                    */
 
-                    """ mengambil data detail group """
+                    /* mengambil data detail group */
                     var group = groups[0].data();
 
-                    """ mengambil group uid  untuk join """
+                    /* mengambil group uid  untuk join */
                     var group_uid = groups[0];
                     
 
-                    """ membuat button widget sesuai dengan nama group yg ada """
+                    /* membuat button widget sesuai dengan nama group yg ada */
                     return ElevatedButton(
                         style: ButtonStyle(backgroundColor:
                             MaterialStateProperty.resolveWith((states) {
@@ -230,7 +233,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                         })),
                         onPressed: () {
 
-                          """ sebuah fungsi untuk pindah halaman ke group yg dicari tadi """
+                          /* sebuah fungsi untuk pindah halaman ke group yg dicari tadi */
                           Navigator.pushNamed(context, '/group_message',
                               arguments: {'group_uid': group_uid.id});
                         },
@@ -282,7 +285,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
   }
 
 
-  """ group container adalah widget yg ingin ditampilkan kedalam pages"""
+  /* group container adalah widget yg ingin ditampilkan kedalam pages */
 
   _groupContainer(BuildContext context, String group_uid, String group_name) {
     _bgButton<Color>(states) {
@@ -295,7 +298,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
     return ElevatedButton(
         onPressed: () {
 
-          """ sebuah fungsi pindah halaman ke dalam group """
+          /* sebuah fungsi pindah halaman ke dalam group */
           Navigator.pushNamed(context, '/group_message',
               arguments: {'group_uid': group_uid, 'group_name': group_name});
         },
@@ -318,7 +321,7 @@ class _SearchGroupScreenState extends State<SearchGroupScreen> {
                       fit: BoxFit.cover)),
               SizedBox(width: 12.0),
 
-              """ sebuah widget untuk menampilkan nama group """
+              /* sebuah widget untuk menampilkan nama group */
               Text("${group_name}",
                   style: textTitle.copyWith(
                       color: Colors.black, fontWeight: FontWeight.w500))

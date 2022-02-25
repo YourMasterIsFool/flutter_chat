@@ -66,6 +66,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         .then((UserCredential userCredential){
 
           User? user= userCredential.user;
+          print(user?.toString());
           print(user?.emailVerified.toString());
           user?.sendEmailVerification().then((result) {
 
